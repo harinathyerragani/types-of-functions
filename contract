@@ -1,0 +1,36 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.17;
+
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+
+contract Token is ERC20 {
+    address public heir;
+    bool public isActivated;
+
+    modifier onlyHeir() {
+        require(msg.sender == heir, "Only the heir can call this function");
+        _;
+    }
+
+    constructor() ERC20(" Token", "TK") {
+        heir = msg.sender;
+    }
+
+    function initialize() external {
+        require(!isActivated, "Already activated");
+        _mint(heir, 0);
+        isActivated = true;
+    }
+
+    function mintTokens(address receiver, uint256 itemize) external onlyHeir {
+        _mint(receiver, itemize);
+    }
+
+    function burnTokens(uint256 itemize) external {
+        _burn(msg.sender, itemize);
+    }
+
+    function transferTo(address receiver, uint256 itemize) external {
+        _transfer(msg.sender, receiver, itemize);
+    }
+}
